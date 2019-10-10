@@ -1,5 +1,5 @@
 import java.util.Scanner;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Iterator;
 
 abstract class Item {
@@ -7,11 +7,10 @@ abstract class Item {
 	private int identificationNumber, numberOfCopies;
 	private int originalNumberOfCopies;
 	private String title;
-	
-	CollectionofItems collectionsRef = new CollectionofItems();
 
-	abstract public void checkIn(String title);
-	abstract public void checkOut(String title);
+	abstract public boolean deleteItem(String title, CollectionOfItems collectionsRef);
+	abstract public void checkIn(String title, CollectionOfItems collectionsRef);
+	abstract public void checkOut(String title, CollectionOfItems collectionsRef);
 	abstract public String toString();
 
 	public void setIdentificationNumber(int number) {
@@ -53,7 +52,7 @@ abstract class WrittenItem extends Item {
 
 class Book extends WrittenItem{
 
-	private ArrayList<Book> booksRef;
+	private LinkedList<Book> booksRef;
 	private Book tempBook;
 
 	@Override
@@ -61,9 +60,9 @@ class Book extends WrittenItem{
 		return this.getIdentificationNumber() + " " + this.getTitle() + " " + this.getAuthor() + " " + this.getNumberOfCopies();
 	}
 
-	public boolean addItem(int identificationNumber, String title, String author, int numberofCopies) {
+	public boolean addItem(int identificationNumber, String title, String author, int numberofCopies, CollectionOfItems collectionsRef) {
 		if(collectionsRef.getBooks() == null) {
-			booksRef = new ArrayList<Book>();
+			booksRef = new LinkedList<Book>();
 			tempBook = new Book();
 			tempBook.setIdentificationNumber(identificationNumber);
 			tempBook.setTitle(title);
@@ -75,7 +74,7 @@ class Book extends WrittenItem{
 			return true;
 		}
 		else {
-			if(searchBook(title)) {
+			if(searchBook(title,collectionsRef)) {
 				return false;
 			}
 			else {
@@ -93,9 +92,10 @@ class Book extends WrittenItem{
 		}
 	}
 
-	public boolean deleteItem(String title) {
+	@Override
+	public boolean deleteItem(String title, CollectionOfItems collectionsRef) {
 		booksRef = collectionsRef.getBooks();
-		if(searchBook(title)) {
+		if(searchBook(title,collectionsRef)) {
 			Book delBook = null;
 			for(Book book : booksRef) {
 				if(book.getTitle().equalsIgnoreCase(title)) {
@@ -112,9 +112,9 @@ class Book extends WrittenItem{
 	}
 
 	@Override
-	public void checkIn(String title) {
+	public void checkIn(String title, CollectionOfItems collectionsRef) {
 		booksRef = collectionsRef.getBooks();
-		if(searchBook(title)) {
+		if(searchBook(title,collectionsRef)) {
 			for(Book book : booksRef) {
 				if(book.getTitle().equalsIgnoreCase(title)) {
 					if(book.getNumberOfCopies()>0) {
@@ -132,9 +132,9 @@ class Book extends WrittenItem{
 	}
 
 	@Override
-	public void checkOut(String title) {
+	public void checkOut(String title, CollectionOfItems collectionsRef) {
 		booksRef = collectionsRef.getBooks();
-		if(searchBook(title)) {
+		if(searchBook(title,collectionsRef)) {
 			for(Book book : booksRef) {
 				if(book.getTitle().equalsIgnoreCase(title)) {
 					if(book.getNumberOfCopies()<book.getOriginalNumberOfCopies()) {
@@ -151,7 +151,7 @@ class Book extends WrittenItem{
 		}
 	}
 
-	public boolean searchBook(String title) {
+	public boolean searchBook(String title, CollectionOfItems collectionsRef) {
 		booksRef = collectionsRef.getBooks();
 		if(booksRef!=null) {
 			for(Book book : booksRef) {
@@ -167,7 +167,7 @@ class Book extends WrittenItem{
 class JournalPaper extends WrittenItem{
 
 	private int yearPublished;
-	private ArrayList<JournalPaper> journalsRef;
+	private LinkedList<JournalPaper> journalsRef;
 	private JournalPaper tempJournal;
 
 	public void setYearPublished(int yearPublished) {
@@ -182,9 +182,9 @@ class JournalPaper extends WrittenItem{
 		return this.getIdentificationNumber() + " " + this.getTitle() + " " + this.getAuthor() + " " + this.getNumberOfCopies() + " " + this.getYearPublished();
 	}
 
-	public boolean addItem(int identificationNumber, String title, String author, int numberofCopies, int yearPublished) {
+	public boolean addItem(int identificationNumber, String title, String author, int numberofCopies, int yearPublished, CollectionOfItems collectionsRef) {
 		if(collectionsRef.getJournalPapers() == null) {
-			journalsRef = new ArrayList<JournalPaper>();
+			journalsRef = new LinkedList<JournalPaper>();
 			tempJournal = new JournalPaper();
 			tempJournal.setIdentificationNumber(identificationNumber);
 			tempJournal.setTitle(title);
@@ -197,7 +197,7 @@ class JournalPaper extends WrittenItem{
 			return true;
 		}
 		else {
-			if(searchJournal(title)) {
+			if(searchJournal(title,collectionsRef)) {
 				return false;
 			}
 			else {
@@ -216,8 +216,9 @@ class JournalPaper extends WrittenItem{
 		}
 	}
 
-	public boolean deleteItem(String title) {
-		if(searchJournal(title)) {
+	@Override
+	public boolean deleteItem(String title, CollectionOfItems collectionsRef) {
+		if(searchJournal(title,collectionsRef)) {
 			JournalPaper delJournal = null;
 			journalsRef = collectionsRef.getJournalPapers();
 			for(JournalPaper journal : journalsRef) {
@@ -236,8 +237,8 @@ class JournalPaper extends WrittenItem{
 	}
 
 	@Override
-	public void checkIn(String title) {
-		if(searchJournal(title)) {
+	public void checkIn(String title, CollectionOfItems collectionsRef) {
+		if(searchJournal(title,collectionsRef)) {
 			journalsRef = collectionsRef.getJournalPapers();
 			for(JournalPaper journal : journalsRef) {
 				if(journal.getTitle().equalsIgnoreCase(title)) {
@@ -257,8 +258,8 @@ class JournalPaper extends WrittenItem{
 	}
 
 	@Override
-	public void checkOut(String title) {
-		if(searchJournal(title)) {
+	public void checkOut(String title, CollectionOfItems collectionsRef) {
+		if(searchJournal(title,collectionsRef)) {
 			journalsRef = collectionsRef.getJournalPapers();
 			for(JournalPaper journal : journalsRef) {
 				if(journal.getTitle().equalsIgnoreCase(title)) {
@@ -277,7 +278,7 @@ class JournalPaper extends WrittenItem{
 		}
 	}
 
-	public boolean searchJournal(String title) {
+	public boolean searchJournal(String title, CollectionOfItems collectionsRef) {
 		journalsRef = collectionsRef.getJournalPapers();
 		if(journalsRef != null) {
 			for(JournalPaper journal : journalsRef) {
@@ -306,7 +307,7 @@ class Video extends MediaItem {
 
 	private String director, genre;
 	private int yearReleased;
-	private ArrayList<Video> videosRef;
+	private LinkedList<Video> videosRef;
 	private Video tempVideo;
 
 	public void setDirector(String director) {
@@ -333,9 +334,9 @@ class Video extends MediaItem {
 		return this.getIdentificationNumber() + " " + this.getTitle() + " " + this.getDirector() + " " + this.getGenre() + " " + this.getRuntime() + " " + this.getNumberOfCopies() + " " + this.getYearReleased();
 	}
 
-	public boolean addItem(int identificationNumber, String title, String director, String genre, int numberofCopies, int runtime, int yearReleased) {
+	public boolean addItem(int identificationNumber, String title, String director, String genre, int numberofCopies, int runtime, int yearReleased, CollectionOfItems collectionsRef) {
 		if(collectionsRef.getVideos() == null) {
-			videosRef = new ArrayList<Video>();
+			videosRef = new LinkedList<Video>();
 			tempVideo = new Video();
 			tempVideo.setIdentificationNumber(identificationNumber);
 			tempVideo.setTitle(title);
@@ -350,7 +351,7 @@ class Video extends MediaItem {
 			return true;
 		}
 		else {
-			if(searchVideo(title)) {
+			if(searchVideo(title,collectionsRef)) {
 				return false;
 			}
 			else {
@@ -371,8 +372,9 @@ class Video extends MediaItem {
 		}
 	}
 
-	public boolean deleteItem(String title) {
-		if(searchVideo(title)) {
+	@Override
+	public boolean deleteItem(String title, CollectionOfItems collectionsRef) {
+		if(searchVideo(title,collectionsRef)) {
 			Video delVideo = null;
 			videosRef = collectionsRef.getVideos();
 			for(Video video : videosRef) {
@@ -391,8 +393,8 @@ class Video extends MediaItem {
 	}
 
 	@Override
-	public void checkIn(String title) {
-		if(searchVideo(title)) {
+	public void checkIn(String title, CollectionOfItems collectionsRef) {
+		if(searchVideo(title,collectionsRef)) {
 			videosRef = collectionsRef.getVideos();
 			for(Video video : videosRef) {
 				if(video.getTitle().equalsIgnoreCase(title)) {
@@ -412,8 +414,8 @@ class Video extends MediaItem {
 	}
 
 	@Override
-	public void checkOut(String title) {
-		if(searchVideo(title)) {
+	public void checkOut(String title, CollectionOfItems collectionsRef) {
+		if(searchVideo(title,collectionsRef)) {
 			videosRef = collectionsRef.getVideos();
 			for(Video video : videosRef) {
 				if(video.getTitle().equalsIgnoreCase(title)) {
@@ -432,7 +434,7 @@ class Video extends MediaItem {
 		}
 	}
 
-	public boolean searchVideo(String title) {
+	public boolean searchVideo(String title, CollectionOfItems collectionsRef) {
 		videosRef = collectionsRef.getVideos();
 		if(videosRef != null) {
 			for(Video video : videosRef) {
@@ -449,7 +451,7 @@ class Video extends MediaItem {
 class CD extends MediaItem {
 
 	private String artist, genre;
-	private ArrayList<CD> cdsRef;
+	private LinkedList<CD> cdsRef;
 	private CD tempCD;
 
 	public void setArtist(String artist) {
@@ -470,9 +472,9 @@ class CD extends MediaItem {
 		return this.getIdentificationNumber() + " " + this.getTitle() + " " + this.getArtist() + " " + this.getGenre() + " " + this.getRuntime() + " " + this.getNumberOfCopies();
 	}
 
-	public boolean addItem(int identificationNumber, String title, String artist, String genre, int numberofCopies, int runtime) {
+	public boolean addItem(int identificationNumber, String title, String artist, String genre, int numberofCopies, int runtime, CollectionOfItems collectionsRef) {
 		if(collectionsRef.getCDs() == null) {
-			cdsRef = new ArrayList<CD>();
+			cdsRef = new LinkedList<CD>();
 			tempCD = new CD();
 			tempCD.setIdentificationNumber(identificationNumber);
 			tempCD.setTitle(title);
@@ -487,7 +489,7 @@ class CD extends MediaItem {
 			return true;
 		}
 		else {
-			if(searchCD(title)) {
+			if(searchCD(title,collectionsRef)) {
 				return false;
 			}
 			else {
@@ -507,8 +509,9 @@ class CD extends MediaItem {
 		}
 	}
 
-	public boolean deleteItem(String title) {
-		if(searchCD(title)) {
+	@Override
+	public boolean deleteItem(String title, CollectionOfItems collectionsRef) {
+		if(searchCD(title,collectionsRef)) {
 			CD delCD = null;
 			cdsRef = collectionsRef.getCDs();
 			for(CD cd : cdsRef) {
@@ -527,8 +530,8 @@ class CD extends MediaItem {
 	}
 
 	@Override
-	public void checkIn(String title) {
-		if(searchCD(title)) {
+	public void checkIn(String title, CollectionOfItems collectionsRef) {
+		if(searchCD(title,collectionsRef)) {
 			cdsRef = collectionsRef.getCDs();
 			for(CD cd : cdsRef) {
 				if(cd.getTitle().equalsIgnoreCase(title)) {
@@ -548,8 +551,8 @@ class CD extends MediaItem {
 	}
 
 	@Override
-	public void checkOut(String title) {
-		if(searchCD(title)) {
+	public void checkOut(String title, CollectionOfItems collectionsRef) {
+		if(searchCD(title,collectionsRef)) {
 			cdsRef = collectionsRef.getCDs();
 			for(CD cd : cdsRef) {
 				if(cd.getTitle().equalsIgnoreCase(title)) {
@@ -568,7 +571,7 @@ class CD extends MediaItem {
 		}
 	}
 
-	public boolean searchCD(String title) {
+	public boolean searchCD(String title, CollectionOfItems collectionsRef) {
 		cdsRef = collectionsRef.getCDs();
 		if(cdsRef != null) {
 			for(CD cd : cdsRef) {
@@ -582,35 +585,35 @@ class CD extends MediaItem {
 
 }
 
-class CollectionofItems{
+class CollectionOfItems{
 
-	private ArrayList<Book> books;
-	private ArrayList<JournalPaper> journalPapers;
-	private ArrayList<Video> videos;
-	private ArrayList<CD> cds;
+	private LinkedList<Book> books;
+	private LinkedList<JournalPaper> journalPapers;
+	private LinkedList<Video> videos;
+	private LinkedList<CD> cds;
 
-	public void setBooks(ArrayList<Book> books) {
+	public void setBooks(LinkedList<Book> books) {
 		this.books = books;
 	}
-	public ArrayList<Book> getBooks() {
+	public LinkedList<Book> getBooks() {
 		return this.books;
 	}
-	public void setJournalPapers(ArrayList<JournalPaper> journalPapers) {
+	public void setJournalPapers(LinkedList<JournalPaper> journalPapers) {
 		this.journalPapers = journalPapers;
 	}
-	public ArrayList<JournalPaper> getJournalPapers() {
+	public LinkedList<JournalPaper> getJournalPapers() {
 		return this.journalPapers;
 	}
-	public void setVideos(ArrayList<Video> videos) {
+	public void setVideos(LinkedList<Video> videos) {
 		this.videos = videos;
 	}
-	public ArrayList<Video> getVideos() {
+	public LinkedList<Video> getVideos() {
 		return this.videos;
 	}
-	public void setCDs(ArrayList<CD> cds) {
+	public void setCDs(LinkedList<CD> cds) {
 		this.videos = videos;
 	}
-	public ArrayList<CD> getCDs() {
+	public LinkedList<CD> getCDs() {
 		return this.cds;
 	}
 
@@ -621,8 +624,8 @@ class RentalManagementSystem {
 	static int tempIdentificationNumber, tempNumberOfCopies, tempYearPublished, tempRuntime, tempYearReleased;
 	static String tempTitle, tempAuthor, tempArtist, tempDirector, tempGenre;
 
-	static void displayBooks() {
-		ArrayList<Book> tempBookDisplay = new Book().collectionsRef.getBooks();
+	static void displayBooks(CollectionOfItems collectionsRef) {
+		LinkedList<Book> tempBookDisplay = collectionsRef.getBooks();
 		if(tempBookDisplay != null) {
 			System.out.println("IdentificationNumber Title Author NumberofCopies");
 			for(Book book : tempBookDisplay) {
@@ -634,8 +637,8 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void displayJournalPapers() {
-		ArrayList<JournalPaper> tempJournalDisplay = new JournalPaper().collectionsRef.getJournalPapers();
+	static void displayJournalPapers(CollectionOfItems collectionsRef) {
+		LinkedList<JournalPaper> tempJournalDisplay = collectionsRef.getJournalPapers();
 		if(tempJournalDisplay != null) {
 			System.out.println("IdentificationNumber Title Author NumberofCopies YearPublished");
 			for(JournalPaper journal : tempJournalDisplay) {
@@ -647,8 +650,8 @@ class RentalManagementSystem {
 		}
 
 	}
-	static void displayVideos() {
-		ArrayList<Video> tempVideoDisplay = new Video().collectionsRef.getVideos();
+	static void displayVideos(CollectionOfItems collectionsRef) {
+		LinkedList<Video> tempVideoDisplay = collectionsRef.getVideos();
 		if(tempVideoDisplay != null) {
 			System.out.println("IdentificationNumber Title Director Genre Runtime NumberofCopies YearReleased");
 			for(Video video : tempVideoDisplay) {
@@ -659,8 +662,8 @@ class RentalManagementSystem {
 			System.out.println("Sorry...Nothing available right now");
 		}
 	}
-	static void displayCDs() {
-		ArrayList<CD> tempCDDisplay = new CD().collectionsRef.getCDs();
+	static void displayCDs(CollectionOfItems collectionsRef) {
+		LinkedList<CD> tempCDDisplay = collectionsRef.getCDs();
 		if(tempCDDisplay != null) {
 			System.out.println("IdentificationNumber Title Artist Genre Runtime NumberofCopies");
 			for(CD cd : tempCDDisplay) {
@@ -672,7 +675,7 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void addBook(Scanner scan) {
+	static void addBook(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the identificationNumber :");
 		RentalManagementSystem.tempIdentificationNumber = scan.nextInt();
@@ -683,7 +686,8 @@ class RentalManagementSystem {
 		RentalManagementSystem.tempAuthor = scan.nextLine();
 		System.out.println("Enter the numberofCopies :");
 		RentalManagementSystem.tempNumberOfCopies = scan.nextInt();
-		if(new Book().addItem(RentalManagementSystem.tempIdentificationNumber,RentalManagementSystem.tempTitle,RentalManagementSystem.tempAuthor,RentalManagementSystem.tempNumberOfCopies)) {
+		scan.nextLine();
+		if(new Book().addItem(RentalManagementSystem.tempIdentificationNumber,RentalManagementSystem.tempTitle,RentalManagementSystem.tempAuthor,RentalManagementSystem.tempNumberOfCopies, collectionsRef)){
 			System.out.println("Book added successfully");
 		}
 		else {
@@ -691,7 +695,7 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void addJournal(Scanner scan) {
+	static void addJournal(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the identificationNumber :");
 		RentalManagementSystem.tempIdentificationNumber = scan.nextInt();
@@ -702,9 +706,11 @@ class RentalManagementSystem {
 		RentalManagementSystem.tempAuthor = scan.nextLine();
 		System.out.println("Enter the numberofCopies :");
 		RentalManagementSystem.tempNumberOfCopies = scan.nextInt();
+		scan.nextLine();
 		System.out.println("Enter the year in which it got published");
 		RentalManagementSystem.tempYearPublished = scan.nextInt();
-		if(new JournalPaper().addItem(RentalManagementSystem.tempIdentificationNumber,RentalManagementSystem.tempTitle,RentalManagementSystem.tempAuthor,RentalManagementSystem.tempNumberOfCopies,RentalManagementSystem.tempYearPublished)) {
+		scan.nextLine();
+		if(new JournalPaper().addItem(RentalManagementSystem.tempIdentificationNumber,RentalManagementSystem.tempTitle,RentalManagementSystem.tempAuthor,RentalManagementSystem.tempNumberOfCopies,RentalManagementSystem.tempYearPublished, collectionsRef)){
 			System.out.println("Journal added successfully");
 		}
 		else {
@@ -712,7 +718,7 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void addVideo(Scanner scan) {
+	static void addVideo(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the identificationNumber :");
 		RentalManagementSystem.tempIdentificationNumber = scan.nextInt();
@@ -725,11 +731,14 @@ class RentalManagementSystem {
 		RentalManagementSystem.tempGenre = scan.nextLine();
 		System.out.println("Enter the numberofCopies :");
 		RentalManagementSystem.tempNumberOfCopies = scan.nextInt();
+		scan.nextLine();
 		System.out.println("Enter the runtime of the video");
 		RentalManagementSystem.tempRuntime = scan.nextInt();
+		scan.nextLine();
 		System.out.println("Enter the year in which video got Released");
 		RentalManagementSystem.tempYearReleased = scan.nextInt();
-		if(new Video().addItem(RentalManagementSystem.tempIdentificationNumber,RentalManagementSystem.tempTitle,RentalManagementSystem.tempDirector,RentalManagementSystem.tempGenre,RentalManagementSystem.tempNumberOfCopies,RentalManagementSystem.tempRuntime,RentalManagementSystem.tempYearReleased)) {
+		scan.nextLine();
+		if(new Video().addItem(RentalManagementSystem.tempIdentificationNumber,RentalManagementSystem.tempTitle,RentalManagementSystem.tempDirector,RentalManagementSystem.tempGenre,RentalManagementSystem.tempNumberOfCopies,RentalManagementSystem.tempRuntime,RentalManagementSystem.tempYearReleased, collectionsRef)) {
 			System.out.println("Video added successfully");
 		}
 		else {
@@ -737,7 +746,7 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void addCD(Scanner scan) {
+	static void addCD(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the identificationNumber :");
 		RentalManagementSystem.tempIdentificationNumber = scan.nextInt();
@@ -750,9 +759,11 @@ class RentalManagementSystem {
 		RentalManagementSystem.tempGenre = scan.nextLine();
 		System.out.println("Enter the numberofCopies :");
 		RentalManagementSystem.tempNumberOfCopies = scan.nextInt();
+		scan.nextLine();
 		System.out.println("Enter the runtime of the video");
 		RentalManagementSystem.tempRuntime = scan.nextInt();
-		if(new CD().addItem(RentalManagementSystem.tempIdentificationNumber,RentalManagementSystem.tempTitle,RentalManagementSystem.tempArtist,RentalManagementSystem.tempGenre,RentalManagementSystem.tempNumberOfCopies,RentalManagementSystem.tempRuntime)) {
+		scan.nextLine();
+		if(new CD().addItem(RentalManagementSystem.tempIdentificationNumber,RentalManagementSystem.tempTitle,RentalManagementSystem.tempArtist,RentalManagementSystem.tempGenre,RentalManagementSystem.tempNumberOfCopies,RentalManagementSystem.tempRuntime, collectionsRef)) {
 			System.out.println("CD added successfully");
 		}
 		else {
@@ -761,11 +772,10 @@ class RentalManagementSystem {
 	}
 
 
-	static void deleteBook(Scanner scan) {
+	static void deleteBook(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the title of the book you wanna delete");
-		scan.nextLine();
-		if(new Book().deleteItem(scan.nextLine())) {
+		if(new Book().deleteItem(scan.nextLine(), collectionsRef)) {
 			System.out.println("Book got deleted successfully");
 		}
 		else {
@@ -773,11 +783,10 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void deleteJournal(Scanner scan) {
+	static void deleteJournal(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the title of the Journal you wanna delete");
-		scan.nextLine();
-		if(new JournalPaper().deleteItem(scan.nextLine())) {
+		if(new JournalPaper().deleteItem(scan.nextLine(), collectionsRef)) {
 			System.out.println("Journal got deleted successfully");
 		}
 		else {
@@ -785,11 +794,10 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void deleteVideo(Scanner scan) {
+	static void deleteVideo(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the title of the Video you wanna delete");
-		scan.nextLine();
-		if(new Video().deleteItem(scan.nextLine())) {
+		if(new Video().deleteItem(scan.nextLine(), collectionsRef)) {
 			System.out.println("Video got deleted successfully");
 		}
 		else {
@@ -797,11 +805,10 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void deleteCD(Scanner scan) {
+	static void deleteCD(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the title of the CD you wanna delete");
-		scan.nextLine();
-		if(new CD().deleteItem(scan.nextLine())) {
+		if(new CD().deleteItem(scan.nextLine(), collectionsRef)) {
 			System.out.println("CD got deleted successfully");
 		}
 		else {
@@ -809,11 +816,10 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void searchMainBook(Scanner scan) {
+	static void searchMainBook(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the title of the book you wanna search");
-		scan.nextLine();
-		if(new Book().searchBook(scan.nextLine())) {
+		if(new Book().searchBook(scan.nextLine(), collectionsRef)) {
 			System.out.println("Yeah it's available");
 		}
 		else {
@@ -821,11 +827,10 @@ class RentalManagementSystem {
 		}		
 	}
 
-	static void searchMainJournal(Scanner scan) {
+	static void searchMainJournal(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the title of the Journal you wanna search");
-		scan.nextLine();
-		if(new JournalPaper().searchJournal(scan.nextLine())) {
+		if(new JournalPaper().searchJournal(scan.nextLine(), collectionsRef)) {
 			System.out.println("Yeah it's available");
 		}
 		else {
@@ -833,11 +838,10 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void searchMainVideo(Scanner scan) {
+	static void searchMainVideo(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the title of the video you wanna search");
-		scan.nextLine();
-		if(new Video().searchVideo(scan.nextLine())) {
+		if(new Video().searchVideo(scan.nextLine(), collectionsRef)) {
 			System.out.println("Yeah it's available");
 		}
 		else {
@@ -845,11 +849,10 @@ class RentalManagementSystem {
 		}
 	}
 
-	static void searchMainCD(Scanner scan) {
+	static void searchMainCD(Scanner scan, CollectionOfItems collectionsRef) {
 
 		System.out.println("Enter the title of the CD you wanna search");
-		scan.nextLine();
-		if(new CD().searchCD(scan.nextLine())) {
+		if(new CD().searchCD(scan.nextLine(), collectionsRef)) {
 			System.out.println("Yeah it's available");
 		}
 		else {
@@ -867,6 +870,7 @@ class RentalManagementSystem {
 	}
 	public static void main(String[] args) {
 		
+		CollectionOfItems collectionsRef = new CollectionOfItems();
 		Scanner scan = new Scanner(System.in);
 		boolean flag;
 		do {
@@ -880,25 +884,27 @@ class RentalManagementSystem {
 			System.out.println("6. Search An Item");
 
 			int option = scan.nextInt();
+			scan.nextLine();
 			switch(option) {
 
 				case 1: 
 				RentalManagementSystem.displayOptions("Display");
 
 				int displayOption = scan.nextInt();
+				scan.nextLine();
 
 				switch(displayOption) {
 					case 1:
-					RentalManagementSystem.displayBooks();
+					RentalManagementSystem.displayBooks(collectionsRef);
 					break;
 					case 2:
-					RentalManagementSystem.displayJournalPapers();
+					RentalManagementSystem.displayJournalPapers(collectionsRef);
 					break;
 					case 3 :
-					RentalManagementSystem.displayVideos();
+					RentalManagementSystem.displayVideos(collectionsRef);
 					break;
 					case 4:
-					RentalManagementSystem.displayCDs();
+					RentalManagementSystem.displayCDs(collectionsRef);
 					break;
 					default:
 					System.out.println("You have entered wrong option");
@@ -909,19 +915,20 @@ class RentalManagementSystem {
 				RentalManagementSystem.displayOptions("Add");
 
 				int addOption = scan.nextInt();
+				scan.nextLine();
 
 				switch(addOption) {
 					case 1:
-					RentalManagementSystem.addBook(scan);
+					RentalManagementSystem.addBook(scan,collectionsRef);
 					break;
 					case 2:
-					RentalManagementSystem.addJournal(scan);
+					RentalManagementSystem.addJournal(scan,collectionsRef);
 					break;
 					case 3 :
-					RentalManagementSystem.addVideo(scan);
+					RentalManagementSystem.addVideo(scan,collectionsRef);
 					break;
 					case 4:
-					RentalManagementSystem.addCD(scan);
+					RentalManagementSystem.addCD(scan,collectionsRef);
 					break;
 					default:
 					System.out.println("You have entered wrong option");
@@ -932,19 +939,20 @@ class RentalManagementSystem {
 				RentalManagementSystem.displayOptions("Delete");
 
 				int delOption = scan.nextInt();
+				scan.nextLine();
 
 				switch(delOption) {
 					case 1:
-					RentalManagementSystem.deleteBook(scan);
+					RentalManagementSystem.deleteBook(scan,collectionsRef);
 					break;
 					case 2:
-					RentalManagementSystem.deleteJournal(scan);
+					RentalManagementSystem.deleteJournal(scan,collectionsRef);
 					break;
 					case 3:
-					RentalManagementSystem.deleteVideo(scan);
+					RentalManagementSystem.deleteVideo(scan,collectionsRef);
 					break;
 					case 4:
-					RentalManagementSystem.deleteCD(scan);
+					RentalManagementSystem.deleteCD(scan,collectionsRef);
 					break;
 					default:
 					System.out.println("You have entered wrong option");
@@ -955,27 +963,24 @@ class RentalManagementSystem {
 				RentalManagementSystem.displayOptions("Check In");
 
 				int checkInOption = scan.nextInt();
+				scan.nextLine();
 
 				switch(checkInOption) {
 					case 1:
 					System.out.println("Enter the title of the book you wanna check in");
-					scan.nextLine();
-					new Book().checkIn(scan.nextLine());
+					new Book().checkIn(scan.nextLine(),collectionsRef);
 					break;
 					case 2:
 					System.out.println("Enter the title of the Journal you wanna check in");
-					scan.nextLine();
-					new JournalPaper().checkIn(scan.nextLine());
+					new JournalPaper().checkIn(scan.nextLine(),collectionsRef);
 					break;
 					case 3:
 					System.out.println("Enter the title of the Video you wanna check in");
-					scan.nextLine();
-					new Video().checkIn(scan.nextLine());
+					new Video().checkIn(scan.nextLine(),collectionsRef);
 					break;
 					case 4:
 					System.out.println("Enter the title of the CD you wanna check in");
-					scan.nextLine();
-					new CD().checkIn(scan.nextLine());
+					new CD().checkIn(scan.nextLine(),collectionsRef);
 					break;
 					default:
 					System.out.println("You have entered wrong option");
@@ -986,27 +991,24 @@ class RentalManagementSystem {
 				RentalManagementSystem.displayOptions("Check Out");
 
 				int checkOutOption = scan.nextInt();
+				scan.nextLine();
 
 				switch(checkOutOption) {
 					case 1:
 					System.out.println("Enter the title of the book you wanna check out");
-					scan.nextLine();
-					new Book().checkOut(scan.nextLine());
+					new Book().checkOut(scan.nextLine(),collectionsRef);
 					break;
 					case 2:
 					System.out.println("Enter the title of the Journal you wanna check out");
-					scan.nextLine();
-					new JournalPaper().checkOut(scan.nextLine());
+					new JournalPaper().checkOut(scan.nextLine(),collectionsRef);
 					break;
 					case 3:
 					System.out.println("Enter the title of the Video you wanna check out");
-					scan.nextLine();
-					new Video().checkOut(scan.nextLine());
+					new Video().checkOut(scan.nextLine(),collectionsRef);
 					break;
 					case 4:
 					System.out.println("Enter the title of the CD you wanna check out");
-					scan.nextLine();
-					new CD().checkOut(scan.nextLine());
+					new CD().checkOut(scan.nextLine(),collectionsRef);
 					break;
 					default:
 					System.out.println("You have entered wrong option");
@@ -1018,19 +1020,20 @@ class RentalManagementSystem {
 				RentalManagementSystem.displayOptions("Search");
 
 				int searchOption = scan.nextInt();
+				scan.nextLine();
 
 				switch(searchOption) {
 					case 1: 
-					RentalManagementSystem.searchMainBook(scan);
+					RentalManagementSystem.searchMainBook(scan,collectionsRef);
 					break;
 					case 2:
-					RentalManagementSystem.searchMainJournal(scan);
+					RentalManagementSystem.searchMainJournal(scan,collectionsRef);
 					break;
 					case 3:
-					RentalManagementSystem.searchMainVideo(scan);
+					RentalManagementSystem.searchMainVideo(scan,collectionsRef);
 					break;
 					case 4:
-					RentalManagementSystem.searchMainCD(scan);
+					RentalManagementSystem.searchMainCD(scan,collectionsRef);
 					break;
 					default:
 					System.out.println("You have entered wrong option");
@@ -1042,9 +1045,7 @@ class RentalManagementSystem {
 				break;
 			}
 			System.out.println("You wanna continue....Yes/No");
-			scan.nextLine();
 			String consent = scan.nextLine();
-			scan.nextLine();
 			if(consent.equalsIgnoreCase("Yes")) {
 				flag = true;
 			}
