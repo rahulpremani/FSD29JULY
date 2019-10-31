@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Register</title>
+</head>
+<body>
+	<center>
+		<h1 style="font-family: Georgia; color : #0EBFE9">Create your account</h1><br><br>
+		<form action="createaccount" method="post">
+		<label for="name">Enter your name :
+			<input type="text" name="name" required title="Mandatory"><br><br>
+		<label for="age">Enter your age :
+			<input type="text" name="age" required title="Mandatory"><br><br>
+		<label for="gender">Enter your gender :
+			<input type="text" name="gender" required title="Mandatory"><br><br>
+		<label for="mobileNumber">Enter your mobile number :
+			<input type="tel" name="mobileNumber" required title="Mandatory"><br><br>
+		<label for="balance">Enter the initial money you wanna deposit :
+			<input type="text" name="balance" required title="Mandatory. Your minimum balance could be 0 also"><br><br>
+		<label for="password">Enter your password
+			<input type="password" pattern=".{6,10}" name="password" required title="length should be 6-10"><br><br>
+		<input type="submit" value="Register">
+		</form>
+	</center>
+</body>
+</html>
